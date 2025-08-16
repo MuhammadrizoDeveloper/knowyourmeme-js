@@ -1,8 +1,9 @@
 {
   "name": "knowyourmeme-js",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "A scraper npm package to search and get details about memes from KnowYourMeme.com",
   "main": "index.js",
+  "types": "index.d.ts",
   "type": "module",
   "scripts": {
     "start": "node src/search.js",
@@ -21,12 +22,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MuhammadrizoDeveloper/knowyourmeme-js.git"
+    "url": "git+https://github.com/yourusername/knowyourmeme-js.git"
   },
   "bugs": {
-    "url": "https://github.com/MuhammadrizoDeveloper/knowyourmeme-js/issues"
+    "url": "https://github.com/yourusername/knowyourmeme-js/issues"
   },
-  "homepage": "https://github.com/MuhammadrizoDeveloper/knowyourmeme-js#readme",
+  "homepage": "https://github.com/yourusername/knowyourmeme-js#readme",
   "dependencies": {
     "axios": "^1.11.0",
     "cheerio": "^1.1.2"

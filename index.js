@@ -1,0 +1,1 @@
+export { search, getMeme } from './src/utils.js';

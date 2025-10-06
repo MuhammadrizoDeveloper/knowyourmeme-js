@@ -4,12 +4,12 @@ import * as cheerio from "cheerio";
 export interface MemeResult {
   title: string,
   link: string,
-  thumbnail: string,
+  thumbnail: string
 }
 
 export interface MemeSection {
   title: string,
-  contents: string[];
+  contents: string[]
 }
 
 export interface MemeDetails {
@@ -33,7 +33,6 @@ const BASE_URL = "https://knowyourmeme.com/search?q=";
  * @param query - The search query string
  * @param max - Maximum number of results to return (default = 10)
  * @returns Promise resolving to an array of MemeResult
- * An array of meme objects
  */
 export async function search(
   query: string,

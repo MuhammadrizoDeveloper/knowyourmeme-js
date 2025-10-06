@@ -1,6 +1,6 @@
 {
   "name": "knowyourmeme-js",
-  "version": "1.0.0",
+  "version": "1.0.4",
   "description": "A scraper npm package to search and get information about memes from KnowYourMeme.com",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",

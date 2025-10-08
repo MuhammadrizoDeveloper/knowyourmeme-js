@@ -2,6 +2,8 @@
 
 A scraper npm package to search and get information about memes from [KnowYourMeme.com](https://knowyourmeme.com/).
 
+GitHub: [knowyourmeme-js](https://github.com/MuhammadrizoDeveloper/knowyourmeme-js)
+
 ## Features
 
 - 🔍 **Search memes** by query with customizable result limits

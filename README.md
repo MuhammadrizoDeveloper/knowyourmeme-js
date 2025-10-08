@@ -85,6 +85,7 @@ Gets detailed information about a specific meme.
   title: string,
   link: string,
   image: string,
+  imageAlt: string,
   views: number | null,
   sections: MemeSection[],
   googleTrends: string,

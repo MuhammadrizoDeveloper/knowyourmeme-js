@@ -16,6 +16,7 @@ export interface MemeDetails {
   title: string,
   link: string,
   image: string,
+  imageAlt: string,
   views: number | null,
   sections: MemeSection[],
   googleTrends: string,
@@ -103,7 +104,7 @@ export async function getMeme(url: string): Promise<MemeDetails | null> {
 
     const $ = cheerio.load(data);
 
-    const result: MemeDetails = { title: "", link: "", image: "", views: null, sections: [], googleTrends: "", type: [], year: "", origin: "", region: "", tags: [] };
+    const result: MemeDetails = { title: "", link: "", image: "", imageAlt: "", views: null, sections: [], googleTrends: "", type: [], year: "", origin: "", region: "", tags: [] };
 
     const info = $("article.entry");
 
@@ -113,14 +114,23 @@ export async function getMeme(url: string): Promise<MemeDetails | null> {
                   .children("section.info")
                   .children("h1").text().trim();
     result.title = title;
+
     const link = url;
     result.link = link;
+
     const image = info
                   .children("div.desktop-only").first()
                   .children("header.rel")
-                  .children("a")
-                  .attr("href") ?? "";
-    result.image = image;
+                  .children("a");
+
+    const imageUrl = image
+                      .attr("href") ?? "";
+    const imageAlt = image
+                      .attr("alt") ?? "";
+
+    result.image = imageUrl;
+    result.imageAlt = imageAlt;
+
     const viewsText = info
                   .children("div.desktop-only").first()
                   .children("header.rel")

@@ -152,12 +152,13 @@ export async function getMeme(url: string): Promise<MemeDetails | null> {
           return false;          
         }
         if (current) sections.push(current);
-        current = { title: $(el).text() ?? "", contents: { images: [] } };
+        current = { title: $(el).text() ?? "", contents: [] };
       } else if ($(el).is("p") && current) {
         if ($(el).text() !== "") {
           current.contents.push($(el).text().replace(/\\[\d+\\]/g, "") ?? "");
         }
       } else if ($(el).is("center") && current) {
+        let imageUrls: string[] = [];
         if ($(el).find("lite-youtube").length) {
           const videoId = $(el).children("lite-youtube").attr("videoid") ?? "";
           const params = $(el).children("lite-youtube").attr("params");
@@ -173,7 +174,8 @@ export async function getMeme(url: string): Promise<MemeDetails | null> {
         } else if ($(el).find("a").length) {
           const image = $(el).children("a").children("img");
           const imageUrl = image.attr("data-src") ?? image.attr("src") ?? "";
-          current.contents.images.push(imageUrl);
+          imageUrls.push(imageUrl);
+          current.contents.push(imageUrls);
         }
       }
     });

@@ -152,7 +152,7 @@ export async function getMeme(url: string): Promise<MemeDetails | null> {
           return false;          
         }
         if (current) sections.push(current);
-        current = { title: $(el).text() ?? "", contents: {} };
+        current = { title: $(el).text() ?? "", contents: { images: [] } };
       } else if ($(el).is("p") && current) {
         if ($(el).text() !== "") {
           current.contents.push($(el).text().replace(/\\[\d+\\]/g, "") ?? "");

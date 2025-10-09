@@ -9,7 +9,7 @@ export interface MemeResult {
 
 export interface MemeSection {
   title: string,
-  contents: string[]
+  contents: Record<string, any>
 }
 
 export interface MemeDetails {
@@ -152,7 +152,7 @@ export async function getMeme(url: string): Promise<MemeDetails | null> {
           return false;          
         }
         if (current) sections.push(current);
-        current = { title: $(el).text() ?? "", contents: [] };
+        current = { title: $(el).text() ?? "", contents: {} };
       } else if ($(el).is("p") && current) {
         if ($(el).text() !== "") {
           current.contents.push($(el).text().replace(/\\[\d+\\]/g, "") ?? "");
@@ -170,6 +170,10 @@ export async function getMeme(url: string): Promise<MemeDetails | null> {
         } else if ($(el).find("lite-tiktok").length) {
           const videoUrl = $(el).children("lite-tiktok").children("blockquote").attr("cite") ?? "";
           current.contents.push(videoUrl);
+        } else if ($(el).find("a").length) {
+          const image = $(el).children("img");
+          const imageUrl = image.attr("data-src") ?? image.attr("src") ?? "";
+          current.contents.images.push(imageUrl);
         }
       }
     });

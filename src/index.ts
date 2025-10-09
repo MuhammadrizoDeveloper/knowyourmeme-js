@@ -155,7 +155,7 @@ export async function getMeme(url: string): Promise<MemeDetails | null> {
         current = { title: $(el).text() ?? "", contents: [] };
       } else if ($(el).is("p") && current) {
         if ($(el).text() !== "") {
-          current.contents.push($(el).text().replace(/$$(\d+)$$/g, "") ?? "");
+          current.contents.push($(el).text().replace(/\\[\d+\\]/g, "") ?? "");
         }
       } else if ($(el).is("center") && current) {
         if ($(el).find("lite-youtube").length) {

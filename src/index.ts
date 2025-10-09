@@ -171,7 +171,7 @@ export async function getMeme(url: string): Promise<MemeDetails | null> {
           const videoUrl = $(el).children("lite-tiktok").children("blockquote").attr("cite") ?? "";
           current.contents.push(videoUrl);
         } else if ($(el).find("a").length) {
-          const image = $(el).children("img");
+          const image = $(el).children("a").children("img");
           const imageUrl = image.attr("data-src") ?? image.attr("src") ?? "";
           current.contents.images.push(imageUrl);
         }

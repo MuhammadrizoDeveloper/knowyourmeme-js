@@ -112,3 +112,8 @@ Gets detailed information about a specific meme.
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+### Disclaimer
+This project is **not affiliated with or endorsed by [KnowYourMeme.com](https://knowyourmeme.com)**.  
+It simply scrapes publicly available data for educational and personal use.  
+Please use this library responsibly and respect the website’s Terms of Service.

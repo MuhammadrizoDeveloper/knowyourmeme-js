@@ -10,6 +10,7 @@ GitHub: [knowyourmeme-js](https://github.com/MuhammadrizoDeveloper/knowyourmeme-
 - 📖 **Get detailed meme information** including images, tags, origin, and more
 - 🚀 **Fast and lightweight** using Cheerio for HTML parsing
 - 📦 **ES6 modules** support
+- 🔵 **TypeScript** support
 - 🛡️ **Error handling** with descriptive error messages
 
 ## Installation
@@ -68,7 +69,7 @@ Searches for memes on KnowYourMeme.com.
 {
   title: string,
   link: string,
-  thumbnail: string
+  thumbnail: { url: string, alt: string }
 }
 ```
 
@@ -86,8 +87,7 @@ Gets detailed information about a specific meme.
 {
   title: string,
   link: string,
-  image: string,
-  imageAlt: string,
+  image: { url: string, alt: string },
   views: number | null,
   sections: MemeSection[],
   googleTrends: string,

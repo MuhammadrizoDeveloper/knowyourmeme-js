@@ -4,19 +4,19 @@ import * as cheerio from "cheerio";
 export interface MemeResult {
   title: string,
   link: string,
-  thumbnail: string
+  thumbnail: { url: string, alt: string }
 }
 
 export interface MemeSection {
   title: string,
-  contents: Record<string, any>
+  contents: any[]
 }
 
 export interface MemeDetails {
   title: string,
   link: string,
-  image: string,
-  imageAlt: string,
+  image: { url: string, alt: string },
+  // imageAlt: string,
   views: number | null,
   sections: MemeSection[],
   googleTrends: string,
@@ -60,17 +60,21 @@ export async function search(
         if (results.length >= max) break;
 
         const $el = $(el);
-        const title = $el.attr("data-title")?.trim();
+
+        const title = $el.attr("data-title")?.trim() ?? "";
+
         const link = `https://knowyourmeme.com${$el.attr("href")}`;
+
         const img = $el.find("div > div:nth-child(1) > div.not-vertical-only > img");
-        const thumbnail = img.attr("data-image") ?? img.attr("src") ?? "";
+        const imgUrl = img.attr("data-image") ?? img.attr("src") ?? "";
+        const imgAlt = img.attr("alt") ?? "";
 
         if (!link) continue;
 
         results.push({
-          title: title ?? "",
+          title,
           link,
-          thumbnail
+          thumbnail: { url: imgUrl, alt: imgAlt }
         });
       }
       if (results.length >= max) break;
@@ -104,7 +108,7 @@ export async function getMeme(url: string): Promise<MemeDetails | null> {
 
     const $ = cheerio.load(data);
 
-    const result: MemeDetails = { title: "", link: "", image: "", imageAlt: "", views: null, sections: [], googleTrends: "", type: [], year: "", origin: "", region: "", tags: [] };
+    const result: MemeDetails = { title: "", link: "", image: { url: "", alt: "" }, views: null, sections: [], googleTrends: "", type: [], year: "", origin: "", region: "", tags: [] };
 
     const info = $("article.entry");
 
@@ -122,14 +126,10 @@ export async function getMeme(url: string): Promise<MemeDetails | null> {
                   .children("div.desktop-only").first()
                   .children("header.rel")
                   .children("a");
+    const imageUrl = image.attr("href") ?? "";
+    const imageAlt = image.attr("alt") ?? "";
 
-    const imageUrl = image
-                      .attr("href") ?? "";
-    const imageAlt = image
-                      .attr("alt") ?? "";
-
-    result.image = imageUrl;
-    result.imageAlt = imageAlt;
+    result.image = { url: imageUrl, alt: imageAlt };
 
     const viewsText = info
                   .children("div.desktop-only").first()
@@ -147,7 +147,7 @@ export async function getMeme(url: string): Promise<MemeDetails | null> {
     const sections: MemeSection[] = [];
     let current: MemeSection | null = null;
     htmlSections.children().each((_, el) => {
-      if ($(el).is("h2")) {
+      if ($(el).is("h1, h2, h3, h4, h5, h6")) {
         if ($(el).text().trim() === "Search Interest") {
           return false;          
         }
@@ -155,30 +155,48 @@ export async function getMeme(url: string): Promise<MemeDetails | null> {
         current = { title: $(el).text() ?? "", contents: [] };
       } else if ($(el).is("p") && current) {
         if ($(el).text() !== "") {
-          current.contents.push($(el).text().replace(/\[\d+\]/g, "") ?? "");
+          current.contents.push($(el).html()?.replace(/\[\d+\]/g, "") ?? "");
         }
       } else if ($(el).is("center") && current) {
-        let imageUrls: string[] = [];
         if ($(el).find("lite-youtube").length) {
-          const videoId = $(el).children("lite-youtube").attr("videoid") ?? "";
-          const params = $(el).children("lite-youtube").attr("params");
-          let startAt = "";
-          if (params) {
-            const match = params.match(/start=(\d+)/);
-            if (match) startAt = `&start=${match[1]}`
-          }
-          current.contents.push(`https://www.youtube.com/watch?v=${videoId}${startAt}`);
+          $(el).find("lite-youtube").each((_, youtubeEl) => {
+            const $youtube = $(youtubeEl);
+            const videoId = $youtube.attr("videoid") ?? "";
+            const params = $youtube.attr("params");
+            let startAt = "";
+            if (params) {
+              const match = params.match(/start=(\d+)/);
+              if (match) startAt = `&start=${match[1]}`
+            }
+            const videoUrl = `https://www.youtube.com/watch?v=${videoId}${startAt}`;
+            current?.contents.push(videoUrl);
+          });
         } else if ($(el).find("lite-tiktok").length) {
-          const videoUrl = $(el).children("lite-tiktok").children("blockquote").attr("cite") ?? "";
-          current.contents.push(videoUrl);
+          $(el).find("lite-tiktok").each((_, tiktokEl) => {
+            const $tiktok = $(tiktokEl);
+            const videoUrl = $tiktok.find("blockquote").attr("cite") || $tiktok.find("blockquote section a").attr("href");
+            current?.contents.push(videoUrl);
+          })
         } else if ($(el).find("a").length) {
-          const image = $(el).children("a").children("img");
-          const imageUrl = image.attr("data-src") ?? image.attr("src") ?? "";
-          imageUrls.push(imageUrl);
-          current.contents.push(imageUrls);
+          const images = $(el).find("a img").toArray();
+          for (const imgEl of images) {
+            const $img = $(imgEl);
+            const imageUrl = $img.attr("data-src");
+            current.contents.push({ imageUrl, imageAlt: $img.attr("alt") ?? "" });
+          }
+        }
+      } else if ($(el).is("blockquote") && current) {
+        if ($(el).children("p").text() !== "") {
+          if($(el).find(`p a[href^="https://twitter.com"]`).length) {
+            const tweetUrl = $(el).find(`a[href^="https://twitter.com"]`).attr("href")?.split("?")[0]?.replace(/twitter\.com/g, "x.com")
+            current.contents.push(tweetUrl);
+          } else {
+            current.contents.push($(el).find("p").html()?.replace(/\[\d+\]/g, "") ?? "");
+          }
         }
       }
     });
+    
     if (current) sections.push(current);
     result.sections = sections;
     
